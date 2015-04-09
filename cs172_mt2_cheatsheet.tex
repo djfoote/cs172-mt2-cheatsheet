@@ -62,6 +62,9 @@ Proof that AH is unrecognizable: Suppose it were recognizable. We will find a re
 \end{enumerate}
 No run $M_{AH}$ on input $\encode{M_y}$ and accept if $M_{AH}$ accepts, which happens only when $M_y$ always halts, which happens only when $M$ loops on $y$. 
 
+\section{Mapping Reduction}
+We say that ``$L_1$ has a mapping reduction to $L_2$", denoted $L_1 \le_m L_2$, if there s a computable function $f: \Sigma_1^* \rightarrow \Sigma_2^*$ such that for all $x \in \Sigma_1^*$, $x \in L_1 \Leftrightarrow f(x) \in L_2$. 
+
 \section{Rice's Theorem}
 Let $C$ be a set of languages. Consider the language $L_C$ defined as $L_C = \{\encode{M} | L(M) \in C\}$. Then either $L_C$ is empty, or it contains the descriptions of all Turing machines, or it is undecidable. 
 
@@ -186,6 +189,9 @@ Prove by enumerating cases and comparing resulting languages.
 \ruler
 \textbf{Problem:} Two binary strings are $\epsilon$-close if $|x| = |y|$, and $x$ and $y$ differ in at most $\epsilon \cdot |x|$ positions. Prove that $Q(x) = \min_y \{K(y) | x,y \text{ are } .0001\text{-close}\}$ is not computable. You can use the fact that ${n \choose k} \le \left(\frac{e\cdot n}{k}\right)^k$. \\
 \textbf{Solution:} There are ${|x| \choose .0001 \cdot |x|}$ strings to which $x$ is .0001-close, so $x$ can be succinctly represented as an encoding of where it differs from some .0001-close string $y$ using $\log {|x| \choose .0001 \cdot |x|} \le \log \left(\frac{e}{.0001}\right)^{.0001 |x|} \le \frac{|x|}{100}$ bits. Since there exists an encoding for $x$ that uses at most $|x|/100 + Q(x) + O(1)$ bits, for sufficiently large $|x|$, we have that $K(x) \le |x|/100 + Q(x) \Rightarrow Q(x) \ge K(x) - |x|/100$. Since there exist incompressible strings, there exists a string of every length above some threshold such that $Q(x) \ge |x| - |x|/100$. Define TM $M$ which takes in $n$ and, if $n$ is above the necessary threshold, returns the first $x$ such that $Q(x) \ge |x| - |x|/100$. Then $K(M(x)) \le \log |x| + O(1)$ since $(\encode{M}, x)$ represents $M(x)$. By construction, $Q(M(x)) \ge |x| - |x|/100$. By the definition of $Q$, $Q(M(x)) \le K(M(x))$. So we have that $|x| - |x|/100 \le \log |x| + O(1)$, which is false for sufficiently large $|x|$. 
+
+\section*{Selected Homework Problems}
+
 
 \end{multicols*}
 \end{document}
