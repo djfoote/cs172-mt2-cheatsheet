@@ -1,0 +1,139 @@
+
+\documentclass[10pt,landscape]{article}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage[landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,relsize}
+\usepackage{color,graphicx,overpic}
+\usepackage{enumitem}
+
+% Remove spacing around lists
+\setlist{nosep}
+
+% Turn off header and footer
+\pagestyle{empty}
+\geometry{top=.25in,left=.25in,right=.25in,bottom=.25in}
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{\z@}{3ex}{2ex}
+                       {\normalfont\normalsize\bfseries\textit}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}{2ex}{0.5ex}
+                          {\normalfont\small\bfseries}}
+\makeatother
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\newcommand{\ruler}{\\\rule{\columnwidth}{0.25pt}\\}
+
+\newcommand{\encode}[1]{\left\langle #1 \right\rangle}
+\newcommand{\comp}[1]{\overline{#1}}
+\newcommand{\NP}{\text{NP}}
+
+% -----------------------------------------------------------------------
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+% multicol parameters
+% These lengths are set only within the two main columns
+% \setlength{\columnseprule}{0.1pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{0pt}
+
+\section{Rice's Theorem}
+Let $C$ be a set of languages. Consider the language $L_C$ defined as $L_C = \{\encode{M} | L(M) \in C\}$. Then either $L_C$ is empty, or it contains the descriptions of all Turing machines, or it is undecidable. 
+
+\textbf{Proof:} Suppose not for some class $C$. Suppose that $\emptyset \not\in C$, otherwise apply the argument below to $L_{\comp{C}}$. Let $M_{in}$ be a machine such that $\encode{M_{in}}$ is in $L_C$. Given an input $(\encode{M}, w)$ for $A_{TM}$, we construct a new Turing machine $M_w$ that does the following: on input $x$, $M_w$ first simulates the behavior of $M$ on input $w$ and 
+\begin{enumerate}[label=\textbullet]
+\item If $M$ on input $w$ loops, then so does $M_w$
+\item If $M$ on input $w$ rejects, then so does $M_w$
+\item If $M$ on input $w$ accepts, then $M_w$ continues with a simulation of $M_{in}$ on input $x$. 
+\end{enumerate}
+In summary:
+\begin{enumerate}[label=\textbullet]
+\item If $M$ accepts $w$, then $M_w$ behaves like $M_{in}$, and $M_w$ accepts an input $x$ if and only if $M_{in}$ does. In other words, $L(M_w) = L(M_{in}) \in C$ and so $\encode{M_w} \in C$. 
+\item If $M$ does not accept $w$, then $M_w$ does not accept any input, and $L(M_w) = \emptyset \not\in C$, which implies $\encode{M_w} \not\in L_C$.
+\end{enumerate}
+We have proved that $(\encode{M}, w) \in A$ if and only if $\encode{M_w} \in L_C$, and so $A_{TM}$ would be decidable if $L_C$ were decidable. 
+% --------------------------------
+
+\section{Godel's Incompleteness Theorems}
+\textbf{Formalization of mathematics:} a set of mathematical statements $S$ and proofs $P$, and a definition of when $P$ is a proof of $S$. We will make the following assumptions:
+\begin{enumerate}
+\item For every Turing machine $M$ and string $x$, there is a statement $S_{M,x}$, which is computable given $\encode{M}$ and $x$, which is meant to encode the fact that $M$ halts on input $x$. 
+\item If $M$ halts on input $x$, then there is a proof $P$ of $S_{M,x}$, which is computable given $\encode{M}$ and $x$.
+\item If $M$ on input $x$ reaches a loop (meaning that the same configuration is encountered twice), then there is a proof of $\neg S_{M,x}$, which is computable given $\encode{M}$ and $x$. 
+\end{enumerate}
+\textbf{Consistency:} a formalization of mathematics is inconsistent if there is a statement $S$ such that both $S$ and $\neg S$ are provable.
+\textbf{Completeness:} a formalization of mathematics is incomplete if there is a statement $S$ such that neither $S$ nor $\neg S$ are provable.
+\ruler
+\textbf{Theorem 1 (Godel)} Every consistent formalization of mathematics that satisfies the assumptions (1), (2) and (3) is incomplete.\\
+\textbf{Proof:} Suppose toward a contradiction that there is a consistent and complete system that satisfies the assumptions. Then we can define an algorithm for the halting problem. We will apply ideas from the proof that the halting problem is undecidable to construct an algorithm $M_G$ that, when given in input its own code, provably halts if and only if it provably loops. This means that either the statements $S_{M_G, \encode{M_G}}$ and $\neg S_{M_G, \encode{M_G}}$ are both provable, in which case the system is inconsistent, or neither of them is provable, in which case the system is incomplete. Consider the following algorithm, and call $M_G$ the Turing machine that implements it:
+\begin{enumerate}
+\item Input: a description $\encode{M}$ of a Turing machine $M$
+\item Construct the statement $S_{M,\encode{M}}$
+\item For every string $P$ in lexicographic order:
+\item \-\hspace{0.5cm} If $P$ is a proof of $S_{M,\encode{M}}$ then loop
+\item \-\hspace{0.5cm} If $P$ is a proof of $\neg S_{M,\encode{M}}$ then halt
+\end{enumerate}
+PUT ON HOLD BECAUSE INCOMPLETENESS WAS NOT IDENTIFIED AS A MAIN MIDTERM AREA
+% --------------------------------
+
+\section{Kolmogorov Complexity}
+\textit{``The first number which can be described in no fewer than fourteen words"}
+\ruler
+The pair $(\encode{M}, y)$ where $M$ is a Turing machine and $y$ is a bit string \textbf{represents} the bot string $x$ if $M$ on input $y$ outputs $x$.
+$K(x)$ is defined as the smallest $k$ for which there exists a representation $(\encode{M}, y)$ of $x$ such that $|(\encode{M}, y)| \le k$
+\ruler
+\textbf{Fact 1:} For every $n$ there is a string $x \in \{0,1\}^n$ such that $K(x) \ge n$.\\
+\textbf{Fact 2:} For every $n$ and every $c$, the probability that a random $n$-bit string $x$ has Kolmogorov complexity at least $n-c$ is more than $1-\frac{1}{2^c}$.
+\ruler
+\textbf{Theorem 3:} Let $R := \{x : K(x) \ge |x|\}$ be the set of incompressible strings. $R$ is not decidable. \\
+\textbf{Proof:} Suppose $M$ is a Turing machine that decides $R$. Then we construct a Turing machine $M'$ that on input the number $n$ outputs the lexicographically first string in $\{0,1\}^n$ which belongs to $R$. Let $\encode{m}$ denote the number $n$ written in binary, using $\lceil \log_2 m \rceil$ bits, and consider the strings of the form $s_n := (\encode{M'}, \encode{n})$. On the one hand, $s_n$, being the output of $M'$ on input $n$, must be an $n$-bit string in $R$, and so $K(s_n) \ge n$. On the other hand, $(\encode{M'},\encode{n})$ is a representation of $s_n$ of length $\log n + c$ for some constant $c$, so we must have $n \le \log n + c$, which is false for sufficiently large values of $n$. 
+\ruler
+Alternate assumption (1): In our formalization of mathematics, for every binary string $x$ and integer $k$, we can construct a statement $S_{x,k}$ equivalent to ``$K(x) \ge k$".\\
+\textbf{Lemma 4:} For every formalization of mathematics satisfying the assumptions, there is a threshold value $t$ such that all statements of the form $S_{x,k}$ with $k>t$ are unprovable. \\
+\textbf{Proof:} Consider the following algorithm:
+\begin{enumerate}
+\item Input $k$
+\item $m := 1$
+\item while (true):
+\item \-\hspace{0.5cm} For all strings $x$ of length at most $m$:
+\item \-\hspace{1cm} For all strings $P$ of length at most $m$:
+\item \-\hspace{1.5cm} If $P$ is a valid proof of $S_{x,k}$, output $x$ and halt
+\item \-\hspace{0.5cm} $m := m+1$
+\end{enumerate}
+Let $M$ be the TM that implements the above algorithm. If $k$ is such that there is a string for which $S_{x,k}$ is provable, then $M$ will find such a string and output it. In such a case we have $k \le M(k) \le \log k + c$ for some constant $c$, because the output of $M$, by construction, has Kolmogorov complexity at least $k$, but the pair $(\encode{M}, \encode{k})$ is a representation of it of length $\log k + O(1)$. 
+% --------------------------------
+
+\section{Circuits and Satisfiability}
+\textbf{Lemma 1:} Let $f : \{0,1\}^n \rightarrow \{0,1\}$ be an arbitrary Boolean function. Then there is a circuit of size $O(2^n)$ that computes $f$.\\
+\textbf{Proof idea:} Recurrence is
+$f(x_1,\ldots,x_n) = (x_n \land f(x_1,\ldots,x_{n-1},1)) \lor (\neg x_n \land f(x_1,\ldots,x_{n-1},0))$ since those are two functions on $n-1$ variables. $C(n) = 2C(n-1) + O(1)$.
+\ruler
+\textbf{Theorem 2:} Let $M = (Q,\Sigma,\Gamma,\delta,q_0,q_A,q_R)$ be a TM that, on inputs of length $n$, runs in time at most $t$. Then there is a circuit of size $O((|\Gamma|\cdot|Q|)^3\cdot t^2)$ that, given an input of length $n$, outputs 1 if and only if $M$ accepts $x$. \\
+\textbf{Proof idea:} A configuration is represented using $t$ blocks of $B = 1 + \log\Gamma + \log Q$ bits that say for each cell: what is on the tape at that cell, is the head on that cell, and if so, what state is the machine in. \\
+For each step, every bit of output depends on at most $3B$ bits of input, so each output bit of the circuit can be computed using $O(2^{3B})$ gates, so that the entire circuit has size $O(t\cdot 2^{3B})$ \textbf{WHY NOT $\mathbf{O(Bt \cdot 2^{3B})}$?}. This is because in one step, only the content of adjacent cells can have any effect on a cell.
+\ruler
+\textbf{Theorem 4:} Circuit-SAT is NP-complete.\\
+\textbf{Proof:} Let $A \in \NP$. Then $A$ has a polynomial-time verifier $V$ whose input has the form $\encode{x,c}$, where $c$ may be the certificate showing that $x \in A$. To construct the reduction, we obtain the circuit simulating $V$. We fill in the inputs to the circuit that correspond to $x$ with the symbols of $w$, the proposed member of $A$ (equivalently, the proposed instance of the problem in NP). The remaining inputs correspond to the certificate $c$. If this circuit is satisfiable, a certificate exists, so $w \in A$. If $w \in A$, a certificate exists, so $C$ is satisfiable. The running time of the verifier is $n^k$ for some $k$, so the size of the circuit is $O(n^{2k})$. 
+\ruler
+\textbf{Theorem 6:} Circuit-SAT $\le_m^p$ 3SAT, so 3SAT is NP-complete.\\
+\textbf{Proof idea:} Change each gate in the circuit to a 3cnf formula, e.g. for AND: $((\comp{w_i}\land\comp{w_j}) \rightarrow \comp{w_k}) \land \cdots$, which can be converted to 3cnf.
+% --------------------------------
+
+\section{Graph Problems}
+\textbf{Clique:} Given a graph $G$ and an integer $k$, is there a clique of size at least $k$? A clique is a subset $K \subseteq V$ such that all the pairs $u,v \in K$ are connected by an edge in $E$.\\
+\textbf{Independent Set (IS):} Given a graph $G$ and an integer $k$, is there an independent set of size at least $k$? An independent set is a subset $S \subseteq V$ such that no pair $u,v \in S$ is connected by an edge in $E$.\\
+\textbf{Reduction idea:} 3SAT $\le_m^p$ IS. For each clause, make a triangle. Add edges between every pair of vertices corresponding to complementary literals.\\
+\textbf{Vertex Cover (VC):} Given a graph $G$ and an integer $k$, is there a vertex cover of size at most $k$? A vertex cover is a subset $C \subseteq V$ such that for every edge $(u,v) \in E$ at least one of $u$ or $v$ is an element of $C$. 
+
+\end{multicols*}
+\end{document}
