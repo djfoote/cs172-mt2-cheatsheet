@@ -33,6 +33,7 @@
 \newcommand{\encode}[1]{\left\langle #1 \right\rangle}
 \newcommand{\comp}[1]{\overline{#1}}
 \newcommand{\NP}{\text{NP}}
+\newcommand{\reduce}{\le_m^p}
 
 % -----------------------------------------------------------------------
 \begin{document}
@@ -120,12 +121,12 @@ $f(x_1,\ldots,x_n) = (x_n \land f(x_1,\ldots,x_{n-1},1)) \lor (\neg x_n \land f(
 \ruler
 \textbf{Theorem 2:} Let $M = (Q,\Sigma,\Gamma,\delta,q_0,q_A,q_R)$ be a TM that, on inputs of length $n$, runs in time at most $t$. Then there is a circuit of size $O((|\Gamma|\cdot|Q|)^3\cdot t^2)$ that, given an input of length $n$, outputs 1 if and only if $M$ accepts $x$. \\
 \textbf{Proof idea:} A configuration is represented using $t$ blocks of $B = 1 + \log\Gamma + \log Q$ bits that say for each cell: what is on the tape at that cell, is the head on that cell, and if so, what state is the machine in. \\
-For each step, every bit of output depends on at most $3B$ bits of input, so each output bit of the circuit can be computed using $O(2^{3B})$ gates, so that the entire circuit has size $O(t\cdot 2^{3B})$ \textbf{WHY NOT $\mathbf{O(Bt \cdot 2^{3B})}$?}. This is because in one step, only the content of adjacent cells can have any effect on a cell.
+For each step, every bit of output depends on at most $3B$ bits of input, so each output bit of the circuit can be computed using $O(2^{3B})$ gates, so that the entire circuit has size $O(t\cdot 2^{3B})$. This is because in one step, only the content of adjacent cells can have any effect on a cell.
 \ruler
 \textbf{Theorem 4:} Circuit-SAT is NP-complete.\\
 \textbf{Proof:} Let $A \in \NP$. Then $A$ has a polynomial-time verifier $V$ whose input has the form $\encode{x,c}$, where $c$ may be the certificate showing that $x \in A$. To construct the reduction, we obtain the circuit simulating $V$. We fill in the inputs to the circuit that correspond to $x$ with the symbols of $w$, the proposed member of $A$ (equivalently, the proposed instance of the problem in NP). The remaining inputs correspond to the certificate $c$. If this circuit is satisfiable, a certificate exists, so $w \in A$. If $w \in A$, a certificate exists, so $C$ is satisfiable. The running time of the verifier is $n^k$ for some $k$, so the size of the circuit is $O(n^{2k})$. 
 \ruler
-\textbf{Theorem 6:} Circuit-SAT $\le_m^p$ 3SAT, so 3SAT is NP-complete.\\
+\textbf{Theorem 6:} Circuit-SAT $\reduce$ 3SAT, so 3SAT is NP-complete.\\
 \textbf{Proof idea:} Change each gate in the circuit to a 3cnf formula, e.g. for AND: $((\comp{w_i}\land\comp{w_j}) \rightarrow \comp{w_k}) \land \cdots$, which can be converted to 3cnf.
 % --------------------------------
 
@@ -134,6 +135,21 @@ For each step, every bit of output depends on at most $3B$ bits of input, so eac
 \textbf{Independent Set (IS):} Given a graph $G$ and an integer $k$, is there an independent set of size at least $k$? An independent set is a subset $S \subseteq V$ such that no pair $u,v \in S$ is connected by an edge in $E$.\\
 \textbf{Reduction idea:} 3SAT $\le_m^p$ IS. For each clause, make a triangle. Add edges between every pair of vertices corresponding to complementary literals.\\
 \textbf{Vertex Cover (VC):} Given a graph $G$ and an integer $k$, is there a vertex cover of size at most $k$? A vertex cover is a subset $C \subseteq V$ such that for every edge $(u,v) \in E$ at least one of $u$ or $v$ is an element of $C$. 
+
+\section{Problems About Subsets of Integers}
+\textbf{Subset Sum:} In Subset Sum the input is a sequence of non-negative integers $a_1,\ldots,a_n$ and a target value $t$. The question is whether there is a subset 
+$S \subseteq \{1,\ldots,n\}$ such that $\sum_{i \in S} a_i = t$.\\
+\textbf{Reduction idea:} VC $\le_m^p$ Subset Sum. Make a set of $a_u$ for each vertex and $b_{u,v}$ for each edge. In base 4, each digit corresponds to an edge (numbered 0 through $|E|-1$), each edge has a 1 in its corresponding digit, each vertex has a 1 for each digit corresponding to its incident edges, and everything else is zeros except for an extra leading digit (the $|E|$th digit), where all vertices have a 1. Then we want to find a sum equal to $k\cdot 4^{|E|} + \sum_{j=0}^{|E|-1} 2 \cdot 4^j$. \\
+\textbf{Partition:} We are given integers $a_1,\ldots,a_n$ and the question is whether there is a subset $S \subseteq \{1,\ldots,n\}$ such that $\sum_{i \in S} a_i = \sum_{j\not\in S} a_j$.\\
+\textbf{Reduction idea:} Subset Sum $\reduce$ Partition. Consider an instance $I=(a_1,\ldots,a_n,t)$ of Subset Sum and define $A = \sum_i a_i$. Construct the instance $I' = (a_1,\ldots,a_n, a_{n+1}, a_{n+2})$ of Partition where $a_{n+1} = 2A - t$ and $a_{n+2} = A + t$. The total sum of the integers in $I'$ is $4A$, so $I'$ is a YES instance of Partition if and only if there is a subset that sums to $2A$. \\
+\textbf{Knapsack:} In the Knapsack problem we are given integer costs $c_1, \ldots, c_n$ and volumes $v_1,\ldots, v_n$, a cost target $t$ and a volume bound $B$. The question is whether there is a subset $S \subseteq \{1,\ldots,n\}$ such that $\sum_{i\in S} c_i \ge t$ and $\sum_i v_i \le B$.\\
+\textbf{Reduction idea:} Start with an instance $a_1,\ldots,a_n,t$ of Subset Sum and define an instance of Knapsack with $n$ items by setting $c_i = v_i = a_i$ and $t=B=k$.\\
+\textbf{Bin Packing:} In the Bin Packing problem we are given volumes $v_1, \ldots, v_n$, a volume bound $B$, and a target $k$. The question is whether we can partition the integers $v_1,\ldots,v_n$ into $k$ subsets such that the integers in each subset sum to at most $B$.\\
+\textbf{Reduction idea:} Partition $\reduce$ Bin Packing. Given an instance $a_1,\ldots,a_n$ of partition, create an instance of Bin Packing where $v_i = a_i$, $B=(\sum_{i=1}^n a_i) / 2$, and $k=2$. 
+
+
+
+
 
 \end{multicols*}
 \end{document}
